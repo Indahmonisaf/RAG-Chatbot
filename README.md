@@ -265,7 +265,6 @@ app/
   vectorstore/chroma_store.py # Chroma setup (persisted in ./index)
 data/                         # place your documents here (if using filesystem mode)
 index/                        # Chroma persistence (auto-created)
-finetune/                     # optional LoRA example
 requirements.txt
 .env                          # your secrets & config (do not commit)
 ```
