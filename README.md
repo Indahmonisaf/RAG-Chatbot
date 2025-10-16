@@ -110,21 +110,6 @@ python -m app.ingest.indexer
 
 You should see something like: `Indexed: N chunks`.
 
-**B) Upload via JSON (no filesystem writes)**
-Start the API first (see 4.2), then:
-
-```powershell
-$body = '{
-  "files": [
-    {"filename":"policy.md","mime":"text/markdown","text":"# Policy\n..."},
-    {"filename":"scan.png","mime":"image/png","base64":"<BASE64_IMAGE>"}
-  ]
-}'
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/ingest-json" -Method POST -ContentType "application/json" -Body $body
-```
-
-This will ingest and index the provided files directly.
-
 ---
 
 ### 4.2. Start the API
