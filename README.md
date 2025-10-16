@@ -314,6 +314,6 @@ requirements.txt
 ![RAG Chatbot – Demo](./demo.gif)
 
 ---
-##Future-Work
+## Future-Work
 
 Fine-tuning (optional): Not included in this submission. For this task, accuracy is driven primarily by Retrieval-Augmented Generation (RAG). Fine-tuning/LoRA could be added later to align style or domain tone once we have a larger, high-quality supervised dataset.
