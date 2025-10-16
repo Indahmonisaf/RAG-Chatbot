@@ -133,7 +133,7 @@ Open **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 **Example – `POST /ask` (PowerShell):**
 
 ```powershell
-$body = '{"question":"What is the main idea of the sustainability report?","top_k":6,"temperature":0.0,"max_tokens":512}'
+$body = '{"question":"can you explain yolov6?","top_k":6,"temperature":0.2,"max_tokens":512}'
 Invoke-RestMethod -Uri "http://127.0.0.1:8000/ask" -Method POST -ContentType "application/json" -Body $body
 ```
 
