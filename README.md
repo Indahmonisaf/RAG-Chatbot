@@ -294,4 +294,8 @@ requirements.txt
 6. Test in **Swagger** (`/docs`) & push to GitHub (exclude `.env`, `index/`, `RAG_chatbot/`).
 
 ---
+## 🎥 Demo Video
 
+```markdown
+![RAG Chatbot – Demo](docs/demo.gif)
+```
