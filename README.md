@@ -296,6 +296,5 @@ requirements.txt
 ---
 ## 🎥 Demo Video
 
-```markdown
-![RAG Chatbot – Demo](docs/demo.gif)
-```
+![RAG Chatbot – Demo](./demo.gif)
+
