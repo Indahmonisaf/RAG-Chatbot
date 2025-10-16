@@ -93,9 +93,6 @@ Tesseract is installed but your current terminal session doesn’t know where it
 ```powershell
 $env:TESSERACT_CMD = "C:\Program Files\Tesseract-OCR\tesseract.exe"
 $env:Path += ";C:\Program Files\Tesseract-OCR"
-
-tesseract --version
-python -c "import pytesseract; print(pytesseract.get_tesseract_version())"
 ```
 ---
 
