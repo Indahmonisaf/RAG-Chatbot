@@ -1,2 +1,302 @@
-# RAG-Chatbot
-A single ask–answer chatbot using RAG (Retrieval-Augmented Generation) with FastAPI + OpenAI + Chroma
+# RAG Chatbot 
+
+> A single ask–answer chatbot using **RAG** (Retrieval-Augmented Generation) with **FastAPI** + **OpenAI** + **Chroma**.
+> Supports ingestion of **.txt, .pdf, .md, .png** (PNG via **Tesseract OCR**).
+> Primary endpoint: `POST /ask`.
+
+---
+
+## 1) Install Python & Create a New Environment (named `RAG_chatbot`)
+
+### Windows (recommended)
+
+1. Install **Python 3.10 or 3.11**
+   Download from [https://www.python.org/downloads/](https://www.python.org/downloads/) and tick **“Add Python to PATH”**.
+
+2. Create and activate a virtual env named **`RAG_chatbot`**:
+
+   ```powershell
+   python -m venv RAG_chatbot
+   .\RAG_chatbot\Scripts\Activate.ps1
+   python -V
+   ```
+
+   You should see the prompt prefixed with `(RAG_chatbot)`.
+
+> In VS Code, set the interpreter to `RAG_chatbot\Scripts\python.exe` (Ctrl+Shift+P → *Python: Select Interpreter*).
+
+---
+
+## 2) Install Requirements
+
+Create a **`.env`** file in the project root with your configuration:
+
+```
+# OpenAI credentials & defaults
+OPENAI_API_KEY=sk-...your-key...
+PROVIDER=openai
+EMBEDDINGS_PROVIDER=openai
+LLM_MODEL=gpt-4o-mini
+EMBEDDING_MODEL=text-embedding-3-small
+
+# Paths & chunking
+DATA_DIR=./data
+PERSIST_DIR=./index
+CHUNK_SIZE=800
+CHUNK_OVERLAP=120
+CHROMA_TELEMETRY_DISABLED=1
+
+# (OCR – set after installing Tesseract, see section 3)
+# TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+# TESSERACT_LANG=eng
+```
+
+Then install dependencies:
+
+```powershell
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+---
+
+## 3) Install Tesseract OCR (for `.png` ingestion)
+
+### Using **winget** (quickest)
+
+```powershell
+winget install -e --id UB-Mannheim.TesseractOCR
+```
+
+Verify:
+
+```powershell
+tesseract --version
+```
+
+Add to your `.env` (recommended for stability):
+
+```
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+TESSERACT_LANG=eng     # or ind / eng+ind
+```
+
+> If `tesseract` is still not recognized, close and reopen your terminal (or VS Code), or ensure `C:\Program Files\Tesseract-OCR` is on your PATH.
+
+---
+
+## 4) How to Run the Project
+
+### 4.1. Provide your dataset (choose one)
+
+**A) Put files in `./data` (simplest)**
+Copy your documents into `.\data\` (mix allowed: `.txt`, `.pdf`, `.md`, `.png`).
+Then **build the vector index**:
+
+```powershell
+python -m app.ingest.indexer
+```
+
+You should see something like: `Indexed: N chunks`.
+
+**B) Upload via JSON (no filesystem writes)**
+Start the API first (see 4.2), then:
+
+```powershell
+$body = '{
+  "files": [
+    {"filename":"policy.md","mime":"text/markdown","text":"# Policy\n..."},
+    {"filename":"scan.png","mime":"image/png","base64":"<BASE64_IMAGE>"}
+  ]
+}'
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/ingest-json" -Method POST -ContentType "application/json" -Body $body
+```
+
+This will ingest and index the provided files directly.
+
+---
+
+### 4.2. Start the API
+
+```powershell
+uvicorn app.api.main:app --host 127.0.0.1 --port 8000
+```
+
+Open **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+**Quick checks:**
+
+* `GET /health` → basic status & model.
+* `GET /sources` → indexed documents and total chunk count.
+* `POST /ask` → ask questions over your data.
+
+**Example – `POST /ask` (PowerShell):**
+
+```powershell
+$body = '{"question":"What is the main idea of the sustainability report?","top_k":6,"temperature":0.0,"max_tokens":512}'
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/ask" -Method POST -ContentType "application/json" -Body $body
+```
+
+**Example response:**
+
+```json
+{
+  "question": "What is the main idea of the sustainability report?",
+  "context_sources": [
+    "report_2024.txt: lines 12–35",
+    "environment_policy.pdf: page 2"
+  ],
+  "answer": "The report highlights emission reduction via renewable energy and waste optimization.",
+  "metadata": {
+    "model": "gpt-4o-mini",
+    "retrieval_engine": "Chroma",
+    "timestamp": "2025-10-16T01:23:45Z",
+    "latency_ms": 842,
+    "top_k": 6,
+    "avg_similarity": 0.76,
+    "provider": "openai"
+  }
+}
+```
+
+---
+
+## 5) How to Delete the Index (and why)
+
+**Command (Windows PowerShell):**
+
+```powershell
+Remove-Item -Recurse -Force .\index
+```
+
+**Why you might need this:**
+
+* You **changed the embedding model** (`EMBEDDING_MODEL`) which changes vector dimensions; the old index becomes incompatible.
+* You want a **clean rebuild** after major dataset changes.
+
+After deleting, rebuild:
+
+```powershell
+python -m app.ingest.indexer
+```
+
+---
+
+## 6) What Dataset Is Used & What Tools Power the System
+
+### Datasets
+
+* Drop files into `./data` and run the indexer, **or** upload via `POST /ingest-json`.
+* Supported:
+
+  * **`.txt`, `.md`** → parsed as text.
+  * **`.pdf`** → parsed via `pypdf`/`pdfplumber`. (If it’s a scanned PDF without text, OCR it to PNG or make a searchable PDF first.)
+  * **`.png`** → OCR via **Tesseract** (requires section 3 above).
+
+### Tools / Stack
+
+* **API framework**: **FastAPI** (interactive docs at `/docs`).
+* **Vector store**: **Chroma** (via `langchain-chroma`, auto-persist at `./index`).
+* **Embeddings**: **OpenAI** `text-embedding-3-small` (or `-large`).
+* **LLM (generator)**: **OpenAI** `gpt-4o-mini` by default.
+* **RAG flow**:
+
+  1. Ingest → clean → split (RecursiveCharacterTextSplitter)
+  2. Embed → store in Chroma
+  3. Retrieve (MMR) → prompt → generate answer
+* **Quality-of-life endpoints**:
+
+  * `GET /health` – service/model status
+  * `GET /sources` – which documents are indexed
+  * `POST /ingest-json` – ingest without using the filesystem
+  * `POST /reindex` – rebuild from `./data`
+  * `GET /metrics` – simple performance metrics (q_count, latency)
+
+---
+
+## 7) How the Model Is Trained / Fine-Tuned (Approach)
+
+This project **does not require fine-tuning** to pass the assessment; RAG is sufficient and recommended. However, an **optional LoRA mini example** is included to demonstrate a tuning approach if needed:
+
+* **Approach**: Use LoRA on a lightweight seq2seq model (e.g., `google/flan-t5-small`) with a handful of domain QA pairs to bias the generator toward your style/terminology. Retrieval (Chroma) remains unchanged; only the **generator** is adapted.
+* **Script**: `finetune/lora_flan_t5_small.py` (optional)
+
+  * Train:
+
+    ```powershell
+    pip install transformers==4.44.0 peft==0.12.0 datasets==2.20.0 accelerate==0.33.0 torch --index-url https://download.pytorch.org/whl/cpu
+    python .\finetune\lora_flan_t5_small.py
+    ```
+  * Outputs a LoRA adapter under `./lora-out/`.
+* **Trade-offs**:
+
+  * Pros: Showcases domain adaptation.
+  * Cons: CPU inference is slower and quality is below OpenAI for complex queries.
+* **Recommendation**: For the submission, keep **OpenAI** as the generator (best quality/latency). Use LoRA only as a documented “nice-to-have.”
+
+---
+
+## 8) Additional Notes & Best Practices
+
+* **Language matching**: Ask in the same language as the documents for best retrieval (English docs → ask in English).
+* **For broad questions** (e.g., “explain the architecture”), increase `top_k` to **8–12** so more relevant chunks are considered.
+* **Changing embedding models**: Always delete `./index` and re-run the indexer to avoid dimension mismatch errors.
+* **Performance**:
+
+  * For demos, run without `--reload` for lower latency.
+  * Keep the index on a fast local SSD.
+  * Use `temperature: 0.0` for factual/technical questions.
+* **Troubleshooting**:
+
+  * `api_key must be set`: ensure `.env` is loaded and `OPENAI_API_KEY` is present.
+  * Dimension mismatch error: delete `./index` and rebuild after changing `EMBEDDING_MODEL`.
+  * `TesseractNotFoundError`: ensure Tesseract is installed and `TESSERACT_CMD` points to the executable; restart terminal.
+
+---
+
+## Project Structure (brief)
+
+```
+app/
+  api/main.py                 # FastAPI routes (/ask, /ingest-json, /reindex, /sources, /health, /metrics)
+  core/                       # config (.env), schema (pydantic), logger
+  ingest/                     # indexer CLI, loaders (txt/pdf/md/png), cleaners
+  rag/                        # retriever (MMR), prompt builder, generator (OpenAI)
+  vectorstore/chroma_store.py # Chroma setup (persisted in ./index)
+data/                         # place your documents here (if using filesystem mode)
+index/                        # Chroma persistence (auto-created)
+finetune/                     # optional LoRA example
+requirements.txt
+.env                          # your secrets & config (do not commit)
+```
+
+---
+
+## Example Submission Flow
+
+1. Create env:
+
+   ```powershell
+   python -m venv RAG_chatbot
+   .\RAG_chatbot\Scripts\Activate.ps1
+   ```
+2. Set up `.env` (with your `OPENAI_API_KEY`).
+3. Install deps:
+
+   ```powershell
+   pip install -r requirements.txt
+   ```
+4. Put a few files into `./data` and build the index:
+
+   ```powershell
+   python -m app.ingest.indexer
+   ```
+5. Start API:
+
+   ```powershell
+   uvicorn app.api.main:app
+   ```
+6. Test in **Swagger** (`/docs`) & push to GitHub (exclude `.env`, `index/`, `RAG_chatbot/`).
+
+---
+
