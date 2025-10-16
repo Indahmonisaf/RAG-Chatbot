@@ -83,7 +83,7 @@ TESSERACT_LANG=eng     # or ind / eng+ind
 ```
 
 > If `tesseract` is still not recognized, close and reopen your terminal (or VS Code), or ensure `C:\Program Files\Tesseract-OCR` is on your PATH.
-```
+
 ### If `tesseract` is “not recognized” (PATH issue)
 
 Tesseract is installed but your current terminal session doesn’t know where it is.
