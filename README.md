@@ -217,29 +217,7 @@ python -m app.ingest.indexer
 
 ---
 
-## 7) How the Model Is Trained / Fine-Tuned (Approach)
-
-This project **does not require fine-tuning** to pass the assessment; RAG is sufficient and recommended. However, an **optional LoRA mini example** is included to demonstrate a tuning approach if needed:
-
-* **Approach**: Use LoRA on a lightweight seq2seq model (e.g., `google/flan-t5-small`) with a handful of domain QA pairs to bias the generator toward your style/terminology. Retrieval (Chroma) remains unchanged; only the **generator** is adapted.
-* **Script**: `finetune/lora_flan_t5_small.py` (optional)
-
-  * Train:
-
-    ```powershell
-    pip install transformers==4.44.0 peft==0.12.0 datasets==2.20.0 accelerate==0.33.0 torch --index-url https://download.pytorch.org/whl/cpu
-    python .\finetune\lora_flan_t5_small.py
-    ```
-  * Outputs a LoRA adapter under `./lora-out/`.
-* **Trade-offs**:
-
-  * Pros: Showcases domain adaptation.
-  * Cons: CPU inference is slower and quality is below OpenAI for complex queries.
-* **Recommendation**: For the submission, keep **OpenAI** as the generator (best quality/latency). Use LoRA only as a documented “nice-to-have.”
-
----
-
-## 8) Additional Notes & Best Practices
+## 7) Additional Notes & Best Practices
 
 * **Language matching**: Ask in the same language as the documents for best retrieval (English docs → ask in English).
 * **For broad questions** (e.g., “explain the architecture”), increase `top_k` to **8–12** so more relevant chunks are considered.
