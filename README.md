@@ -72,6 +72,7 @@ Verify:
 
 ```powershell
 tesseract --version
+python -c "import pytesseract; print(pytesseract.get_tesseract_version())"
 ```
 
 Add to your `.env` (recommended for stability):
@@ -82,7 +83,20 @@ TESSERACT_LANG=eng     # or ind / eng+ind
 ```
 
 > If `tesseract` is still not recognized, close and reopen your terminal (or VS Code), or ensure `C:\Program Files\Tesseract-OCR` is on your PATH.
+```
+### If `tesseract` is “not recognized” (PATH issue)
 
+Tesseract is installed but your current terminal session doesn’t know where it is.
+
+**Fix for the current session (quick):**
+
+```powershell
+$env:TESSERACT_CMD = "C:\Program Files\Tesseract-OCR\tesseract.exe"
+$env:Path += ";C:\Program Files\Tesseract-OCR"
+
+tesseract --version
+python -c "import pytesseract; print(pytesseract.get_tesseract_version())"
+```
 ---
 
 ## 4) How to Run the Project
