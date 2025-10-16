@@ -195,6 +195,25 @@ python -m app.ingest.indexer
   * **`.txt`, `.md`** → parsed as text.
   * **`.pdf`** → parsed via `pypdf`/`pdfplumber`. (If it’s a scanned PDF without text, OCR it to PNG or make a searchable PDF first.)
   * **`.png`** → OCR via **Tesseract** (requires section 3 above).
+Got it—I’ll give you a short, drop-in subsection you can paste under **“6) What Dataset Is Used & What Tools Power the System”** to explicitly state *your* dataset choice (YOLOv6 paper screenshots).
+
+---
+
+### Dataset used in this submission (my case)
+
+For this submission, I used **PNG screenshots** extracted from the **YOLOv6 paper** as the dataset. The images were placed in `./data/` and indexed via OCR (Tesseract). This choice demonstrates that the system can work even when the source material is **image-only** (no selectable PDF text).
+
+**Folder example**
+
+```
+data/
+  Screenshot 2025-10-16 072349.png   #page 1-2
+  Screenshot 2025-10-16 072406.png   #page 3-4
+  Screenshot 2025-10-16 072417.png   #page 5-6
+  Screenshot 2025-10-16 072430.png   #page 7-8
+  Screenshot 2025-10-16 072440.png   #page 9-10
+  Screenshot 2025-10-16 072450.png   #page 11-12
+```
 
 ### Tools / Stack
 
