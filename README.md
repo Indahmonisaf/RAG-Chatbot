@@ -197,19 +197,34 @@ Got it—I’ll give you a short, drop-in subsection you can paste under **“6)
 
 ### Dataset used in this submission (my case)
 
-For this submission, I used **PNG screenshots** extracted from the **YOLOv6 paper** as the dataset. The images were placed in `./data/` and indexed via OCR (Tesseract). This choice demonstrates that the system can work even when the source material is **image-only** (no selectable PDF text).
+For this submission, I used a **mixed dataset** consisting of:
+
+* **PNG screenshots** from a paper (indexed via **OCR / Tesseract**),
+* **One PDF** (`maskrcnn.pdf`) extracted as text,
+* **One Markdown** file (`yolov7.md`),
+* **One TXT** file (`yolov10.txt`).
+
+This demonstrates the system’s ability to handle **image-only sources** (via OCR) as well as **text-based** documents (PDF/MD/TXT) in the same index.
 
 **Folder example**
 
 ```
 data/
-  Screenshot 2025-10-16 072349.png   #page 1-2
-  Screenshot 2025-10-16 072406.png   #page 3-4
-  Screenshot 2025-10-16 072417.png   #page 5-6
-  Screenshot 2025-10-16 072430.png   #page 7-8
-  Screenshot 2025-10-16 072440.png   #page 9-10
-  Screenshot 2025-10-16 072450.png   #page 11-12
+  maskrcnn.pdf                       # pdf file
+  Screenshot 2025-10-16 072349.png   # png file (pages 1–2)
+  Screenshot 2025-10-16 072406.png   # png file (pages 3–4)
+  Screenshot 2025-10-16 072417.png   # png file (pages 5–6)
+  Screenshot 2025-10-16 072430.png   # png file (pages 7–8)
+  Screenshot 2025-10-16 072440.png   # png file (pages 9–10)
+  Screenshot 2025-10-16 072450.png   # png file (pages 11–12)
+  yolov7.md                          # markdown file
+  yolov10.txt                        # text file
 ```
+
+**Notes**
+
+* PNGs are converted to text via Tesseract OCR (`TESSERACT_CMD` and `TESSERACT_LANG` set in `.env`).
+* PDF/MD/TXT are parsed directly and chunked using the same parameters (`CHUNK_SIZE`, `CHUNK_OVERLAP`).
 
 ### Tools / Stack
 
