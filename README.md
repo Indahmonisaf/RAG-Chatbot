@@ -141,19 +141,22 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/ask" -Method POST -ContentType "ap
 
 ```json
 {
-  "question": "What is the main idea of the sustainability report?",
+  "question": "can you explain yolov6?",
   "context_sources": [
-    "report_2024.txt: lines 12–35",
-    "environment_policy.pdf: page 2"
+    "Screenshot 2025-10-16 072406.png: lines 1–8",
+    "Screenshot 2025-10-16 072349.png: lines 1–10",
+    "Screenshot 2025-10-16 072430.png: lines 1–6",
+    "Screenshot 2025-10-16 072406.png: lines 1–12",
+    "Screenshot 2025-10-16 072349.png: lines 1–12"
   ],
-  "answer": "The report highlights emission reduction via renewable energy and waste optimization.",
+  "answer": "YOLOv6 is a detection model designed with hardware-friendly principles, featuring two scalable parameterizable backbones and necks to accommodate models of different sizes. It includes an efficient decoupled head utilizing a hybrid-channel strategy. YOLOv6 achieves notable performance, hitting 35.9% Average Precision (AP) on the COCO dataset at a throughput of 1234 FPS on an NVIDIA Tesla T4 GPU. The model also offers a faster version, YOLOv6-L-ReLU, which achieves 51.7% AP with a latency of 8.8 ms, outperforming other models like YOLOX-L and PPYOLOE-L in both accuracy and speed. Additionally, YOLOv6 incorporates a self-distillation strategy and various advanced detection techniques to enhance performance.",
   "metadata": {
     "model": "gpt-4o-mini",
     "retrieval_engine": "Chroma",
-    "timestamp": "2025-10-16T01:23:45Z",
-    "latency_ms": 842,
+    "timestamp": "2025-10-16T01:03:10.957011Z",
+    "latency_ms": 6434,
     "top_k": 6,
-    "avg_similarity": 0.76,
+    "avg_similarity": 0.371,
     "provider": "openai"
   }
 }
