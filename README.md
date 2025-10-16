@@ -4,7 +4,7 @@
 > Supports ingestion of **.txt, .pdf, .md, .png** (PNG via **Tesseract OCR**).
 > Primary endpoint: `POST /ask`.
 
-Author: Indah Monisa Firdiantika
+###Author: Indah Monisa Firdiantika
 ---
 
 ## 1) Install Python & Create a New Environment (named `RAG_chatbot`)
